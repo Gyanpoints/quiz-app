@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GyanPoints Quizzes</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="home-hdr">
+        <div class="home-hdr-inner">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>GyanPoints</span>
+            </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </div>
+
+    <main class="home-main">
+        <div class="home-hero">
+            <h1>Choose a Quiz</h1>
+            <p>Select any quiz below and start practicing. More quizzes coming soon!</p>
+        </div>
+
+        <div class="quiz-grid" id="quizGrid">
+            <!-- Cards injected by JS -->
+        </div>
+    </main>
+
+    <footer class="home-footer">
+        <p>
+            <a href="tools/converter.html">Excel / CSV → Quiz Converter</a>
+            &nbsp;·&nbsp;
+            <a href="tools/GOOGLE_SHEETS.md">Google Sheets guide</a>
+        </p>
+        <p style="margin-top:8px">Made with ❤️ for learners · <a href="https://t.me/rbsepaper" target="_blank">GyanPoints</a></p>
+    </footer>
+
+    <script src="config.js"></script>
+    <script>
+        // Theme
+        const themeToggle = document.getElementById('themeToggle');
+        let dark = localStorage.getItem('quiz-dark') === '1';
+        if (dark) document.body.classList.add('dark-mode');
+        themeToggle.innerHTML = dark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        themeToggle.addEventListener('click', () => {
+            dark = !dark;
+            document.body.classList.toggle('dark-mode', dark);
+            localStorage.setItem('quiz-dark', dark ? '1' : '0');
+            themeToggle.innerHTML = dark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        // Adaptive preference
+        let adaptivePref = localStorage.getItem('quiz-adaptive') === '1';
+        const adaptToggle = document.getElementById('adaptiveToggle');
+        if (adaptToggle) {
+            adaptToggle.checked = adaptivePref;
+            adaptToggle.addEventListener('change', () => {
+                adaptivePref = adaptToggle.checked;
+                localStorage.setItem('quiz-adaptive', adaptivePref ? '1' : '0');
+                renderCards();
+            });
+        }
+
+        function renderCards() {
+            const grid = document.getElementById('quizGrid');
+            grid.innerHTML = '';
+            QUIZ_LIST.forEach(q => {
+                const card = document.createElement('div');
+                card.className = 'quiz-card';
+                const adaptQ = adaptivePref ? '&adaptive=1' : '';
+                card.innerHTML = `
+                    <div class="quiz-card-icon" style="background:${q.color}20;color:${q.color}">
+                        <i class="fas ${q.icon}"></i>
+                    </div>
+                    <div class="quiz-card-body">
+                        <h3>${q.title}${adaptivePref ? '<span class="adaptive-tag">Adaptive</span>' : ''}</h3>
+                        <p>${q.description}</p>
+                        <div class="quiz-card-meta">
+                            <span><i class="fas fa-clock"></i> ${q.duration} min</span>
+                            <a class="start-btn" href="quiz.html?id=${encodeURIComponent(q.id)}${adaptQ}">
+                                Start <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div class="quiz-card-actions">
+                            <a class="mode-link" href="quiz.html?id=${encodeURIComponent(q.id)}">Normal</a>
+                            <a class="mode-link adaptive" href="quiz.html?id=${encodeURIComponent(q.id)}&adaptive=1">Adaptive</a>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        renderCards();
+    </script>
+</body>
+</html>

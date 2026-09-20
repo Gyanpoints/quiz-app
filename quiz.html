@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quiz – GyanPoints</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+        <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\(', '\)']],
+          displayMath: [['$$', '$$'], ['\[', '\]']],
+          processEscapes: true,
+          processEnvironments: true,
+          packages: {'[+]': ['ams', 'newcommand']}
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'tex2jax_process'
+        },
+        // CHTML output — inherit page fonts for text mixed with Hindi
+        chtml: {
+          scale: 1.05,
+          minScale: 0.5,
+          matchFontHeight: true,
+          mtextInheritFont: true,   // 	ext{} and mtext use page font (Devanagari OK)
+          merrorInheritFont: true,
+          displayAlign: 'left',
+          // Prefer fonts that cover Latin + math; Hindi stays outside MathJax spans
+          fontURL: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2'
+        },
+        svg: {
+          fontCache: 'global',
+          scale: 1.05,
+          mtextInheritFont: true
+        },
+        startup: {
+          ready: () => {
+            MathJax.startup.defaultReady();
+            document.dispatchEvent(new Event('mathjax-ready'));
+          }
+        }
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/input/tex/extensions/mhchem.js" async></script>
+</head>
+<body>
+    <div class="hdr">
+        <div class="hdr-l">
+            <a href="index.html" class="back-btn" title="Back to quizzes"><i class="fas fa-arrow-left"></i></a>
+            <div class="q-info" id="qInfo">Q1/?</div>
+            <div class="timer" id="timer">00:00</div>
+        </div>
+        <div class="hdr-c" id="quizTitle">GyanPoints</div>
+        <div class="hdr-r">
+            <button class="theme-toggle" id="soundToggle" aria-label="Toggle sound" title="Sound ON"><i class="fas fa-volume-up"></i></button>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><i class="fas fa-moon"></i></button>
+            <button class="btn btn-o btn-sm" id="menuBtn" aria-label="Question palette"><i class="fas fa-th"></i></button>
+            <button class="btn btn-p btn-sm" id="subBtn">Submit</button>
+        </div>
+    </div>
+
+    <div class="cont">
+        <div class="q-card">
+            <div class="lang lang-toggle" role="group" aria-label="Language">
+                <button type="button" class="lang-btn active" id="engBtn" aria-pressed="true">English</button>
+                <button type="button" class="lang-btn" id="hinBtn" aria-pressed="false">हिंदी</button>
+            </div>
+
+            <div id="compSec" class="comp" style="display:none">
+                <h4><i class="fas fa-book"></i> Comprehension</h4>
+                <div id="compCont"></div>
+            </div>
+
+            <div class="q-txt" id="qTxt"></div>
+            <div class="opts" id="opts"></div>
+
+            <div class="sol" id="sol">
+                <div class="sol-info" id="solInfo"></div>
+                <h4><i class="fas fa-lightbulb"></i> Solution</h4>
+                <div id="solCont"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav">
+        <button class="btn btn-o nav-btn" id="prevBtn" type="button" aria-label="Previous">
+            <i class="fas fa-chevron-left"></i><span class="nav-label"> Prev</span>
+        </button>
+        <button class="btn btn-w nav-btn" id="reviewBtn" type="button" aria-label="Mark for review">
+            <i class="fas fa-flag"></i><span class="nav-label"> Review</span>
+        </button>
+        <div class="prog">
+            <div id="progTxt">1 of ?</div>
+            <div class="prog-sub">Answered: <span id="ansCnt">0</span></div>
+        </div>
+        <button class="btn btn-p nav-btn" id="nextBtn" type="button" aria-label="Next">
+            <span class="nav-label">Next </span><i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <!-- Desktop sidebar -->
+    <div class="desktop-sidebar" id="desktopSidebar">
+        <h3>Questions</h3>
+        <div class="q-grid" id="desktopQGrid"></div>
+        <div class="legend">
+            <div class="legend-item"><div class="q-num ans">✓</div><span>Answered</span></div>
+            <div class="legend-item"><div class="q-num review">!</div><span>Review</span></div>
+            <div class="legend-item"><div class="q-num wrong">✗</div><span>Incorrect</span></div>
+            <div class="legend-item"><div class="q-num unattempted">?</div><span>Unattempted</span></div>
+        </div>
+    </div>
+
+    <!-- Mobile panel -->
+    <div class="panel" id="panel">
+        <div class="panel-hdr">
+            <h3>All Questions</h3>
+            <button class="panel-close" id="panelClose"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="q-grid" id="qGrid"></div>
+        <div class="legend panel-legend">
+            <div class="legend-item"><div class="q-num ans">✓</div><span>Answered</span></div>
+            <div class="legend-item"><div class="q-num review">!</div><span>Review</span></div>
+            <div class="legend-item"><div class="q-num wrong">✗</div><span>Incorrect</span></div>
+            <div class="legend-item"><div class="q-num unattempted">?</div><span>Unattempted</span></div>
+        </div>
+    </div>
+
+    <button class="print-btn" id="printBtn" style="display:none" aria-label="Print result">
+        <i class="fas fa-print"></i>
+    </button>
+
+    <!-- Result Modal -->
+    <div class="modal" id="modalOver">
+        <div class="result">
+            <h2>Test Complete!</h2>
+            <div class="score" id="scoreDisp">0/0</div>
+            <div class="stats">
+                <div class="stat c"><div class="stat-val" id="corrStat">0</div><div class="stat-lbl">Correct</div></div>
+                <div class="stat w"><div class="stat-val" id="incStat">0</div><div class="stat-lbl">Incorrect</div></div>
+                <div class="stat"><div class="stat-val" id="unaStat">0</div><div class="stat-lbl">Unattempted</div></div>
+                <div class="stat"><div class="stat-val" id="timeStat">0</div><div class="stat-lbl">Minutes</div></div>
+            </div>
+            <div class="modal-acts">
+                <button class="btn btn-o modal-btn" id="closeModal">Close</button>
+                <button class="btn btn-p modal-btn" id="revBtn">Review</button>
+                <a href="index.html" class="btn btn-o modal-btn" style="text-decoration:none;text-align:center">Home</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading state -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading quiz...</p>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
